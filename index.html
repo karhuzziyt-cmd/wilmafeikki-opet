@@ -7,11 +7,17 @@
         body { font-family: sans-serif; padding: 20px; background: #f0f2f5; }
         .card { background: white; padding: 20px; border-radius: 10px; max-width: 500px; margin: 0 auto 20px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
         h2 { color: #003366; border-bottom: 2px solid #003366; padding-bottom: 10px; }
-        input, select, textarea { width: 100%; padding: 10px; margin: 10px 0; border: 1px solid #ccc; border-radius: 5px; box-sizing: border-box; }
-        button { width: 100%; padding: 12px; background: #003366; color: white; border: none; border-radius: 5px; cursor: pointer; font-weight: bold; }
+        label { font-size: 12px; color: #666; font-weight: bold; display: block; margin-top: 10px; }
+        input, select, textarea { width: 100%; padding: 10px; margin: 5px 0 15px; border: 1px solid #ccc; border-radius: 5px; box-sizing: border-box; }
+        
+        /* Värivalitsimen tyyli */
+        .color-input { height: 50px; cursor: pointer; padding: 5px; }
+        
+        button { width: 100%; padding: 12px; background: #003366; color: white; border: none; border-radius: 5px; cursor: pointer; font-weight: bold; font-size: 16px; }
         button:hover { background: #002244; }
+        
         .tab-btns { display: flex; gap: 10px; justify-content: center; margin-bottom: 20px; }
-        .tab-btn { background: #ddd; color: black; padding: 10px 20px; border-radius: 20px; cursor: pointer; }
+        .tab-btn { background: #ddd; color: black; padding: 10px 20px; border-radius: 20px; cursor: pointer; font-weight: bold; }
         .tab-btn.active { background: #003366; color: white; }
     </style>
 </head>
@@ -24,25 +30,42 @@
 
     <div id="tabMerkinta" class="card">
         <h2>Uusi Wilma-merkintä</h2>
-        <input type="email" id="targetEmail" placeholder="Oppilaan sähköposti">
-        <input type="text" id="teacherName" placeholder="Opettajan nimi">
-        <input type="text" id="subject" placeholder="Aine (esim. Matematiikka)">
-        <select id="reason">
-            <option value="Huomautus">Huomautus</option>
-            <option value="Myöhästyminen">Myöhästyminen</option>
-            <option value="Unohdus">Varusteunohdus</option>
-            <option value="Kiitos">Positiivinen palaute</option>
-        </select>
-        <textarea id="comment" placeholder="Lisätiedot..."></textarea>
+        
+        <label>Oppilaan sähköposti</label>
+        <input type="email" id="targetEmail" placeholder="esim. oppilas@koulu.fi">
+        
+        <label>Opettajan nimi</label>
+        <input type="text" id="teacherName" placeholder="esim. Opettaja Virtanen">
+        
+        <label>Oppiaine</label>
+        <input type="text" id="subject" placeholder="esim. Matematiikka">
+        
+        <label>Merkinnän aihe (esim. Huomautus, Kiitos, Myöhästyminen)</label>
+        <input type="text" id="reason" placeholder="Kirjoita merkinnän otsikko">
+        
+        <label>Valitse merkinnän väri (palkki vasemmassa reunassa)</label>
+        <input type="color" id="colorPicker" class="color-input" value="#d32f2f">
+        
+        <label>Lisätiedot / Kommentti</label>
+        <textarea id="comment" rows="4" placeholder="Kirjoita vapaamuotoinen palaute tähän..."></textarea>
+        
         <button onclick="sendNote()">LÄHETÄ MERKINTÄ</button>
     </div>
 
     <div id="tabViesti" class="card" style="display:none;">
         <h2>Luo uusi viesti</h2>
-        <input type="email" id="msgTarget" placeholder="Vastaanottajan sähköposti">
-        <input type="text" id="msgSender" placeholder="Lähettäjän nimi">
-        <input type="text" id="msgSubject" placeholder="Aihe">
-        <textarea id="msgBody" rows="6" placeholder="Viestin sisältö..."></textarea>
+        <label>Vastaanottajan sähköposti</label>
+        <input type="email" id="msgTarget" placeholder="oppilas@koulu.fi">
+        
+        <label>Lähettäjän nimi</label>
+        <input type="text" id="msgSender" placeholder="Opettaja Virtanen">
+        
+        <label>Aihe</label>
+        <input type="text" id="msgSubject" placeholder="Viestin otsikko">
+        
+        <label>Viestin sisältö</label>
+        <textarea id="msgBody" rows="6" placeholder="Kirjoita viestin sisältö tähän..."></textarea>
+        
         <button onclick="sendMessage()" style="background: #28a745;">LÄHETÄ VIESTI</button>
     </div>
 
@@ -70,30 +93,59 @@
         };
 
         window.sendNote = async () => {
+            const email = document.getElementById('targetEmail').value.toLowerCase().trim();
+            const teacher = document.getElementById('teacherName').value;
             const reason = document.getElementById('reason').value;
-            const colors = { "Huomautus": "#d32f2f", "Myöhästyminen": "#fbc02d", "Unohdus": "#7b1fa2", "Kiitos": "#388e3c" };
-            
-            await addDoc(collection(db, "merkinnat"), {
-                targetEmail: document.getElementById('targetEmail').value.toLowerCase().trim(),
-                teacher: document.getElementById('teacherName').value,
-                subject: document.getElementById('subject').value,
-                reason: reason,
-                comment: document.getElementById('comment').value,
-                color: colors[reason],
-                date: serverTimestamp()
-            });
-            alert("Merkintä lähetetty!");
+            const color = document.getElementById('colorPicker').value;
+
+            if (!email || !reason) {
+                alert("Täytä vähintään sähköposti ja aihe!");
+                return;
+            }
+
+            try {
+                await addDoc(collection(db, "merkinnat"), {
+                    targetEmail: email,
+                    teacher: teacher,
+                    subject: document.getElementById('subject').value,
+                    reason: reason,
+                    comment: document.getElementById('comment').value,
+                    color: color,
+                    date: serverTimestamp()
+                });
+                alert("Merkintä lähetetty onnistuneesti!");
+                // Tyhjennetään kentät
+                document.getElementById('reason').value = "";
+                document.getElementById('comment').value = "";
+            } catch (e) {
+                alert("Virhe lähetyksessä: " + e.message);
+            }
         };
 
         window.sendMessage = async () => {
-            await addDoc(collection(db, "viestit"), {
-                targetEmail: document.getElementById('msgTarget').value.toLowerCase().trim(),
-                sender: document.getElementById('msgSender').value,
-                subject: document.getElementById('msgSubject').value,
-                body: document.getElementById('msgBody').value,
-                date: serverTimestamp()
-            });
-            alert("Viesti lähetetty!");
+            const email = document.getElementById('msgTarget').value.toLowerCase().trim();
+            const sender = document.getElementById('msgSender').value;
+            const subject = document.getElementById('msgSubject').value;
+
+            if (!email || !subject) {
+                alert("Täytä vähintään sähköposti ja aihe!");
+                return;
+            }
+
+            try {
+                await addDoc(collection(db, "viestit"), {
+                    targetEmail: email,
+                    sender: sender,
+                    subject: subject,
+                    body: document.getElementById('msgBody').value,
+                    date: serverTimestamp()
+                });
+                alert("Viesti lähetetty onnistuneesti!");
+                document.getElementById('msgSubject').value = "";
+                document.getElementById('msgBody').value = "";
+            } catch (e) {
+                alert("Virhe lähetyksessä: " + e.message);
+            }
         };
     </script>
 </body>
