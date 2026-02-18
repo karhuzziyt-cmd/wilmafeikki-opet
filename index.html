@@ -3,41 +3,25 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Wilma - Opettajien paneeli</title>
+    <title>Wilma - Opettaja</title>
     <style>
-        body { font-family: sans-serif; background: #003366; padding: 20px; color: #333; }
-        .panel { background: white; max-width: 500px; margin: 30px auto; padding: 25px; border-radius: 15px; box-shadow: 0 10px 30px rgba(0,0,0,0.3); }
-        h2 { color: #003366; text-align: center; margin-bottom: 20px; }
-        label { font-size: 12px; font-weight: bold; color: #666; display: block; margin-top: 10px; }
-        input, textarea { width: 100%; padding: 12px; margin: 5px 0 15px; border: 1px solid #ddd; border-radius: 8px; box-sizing: border-box; font-size: 14px; }
-        button { width: 100%; padding: 15px; background: #003366; color: white; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; transition: 0.2s; font-size: 16px; }
-        button:hover { background: #004c99; }
-        button:disabled { background: #ccc; }
+        body { font-family: sans-serif; background: #003366; padding: 20px; }
+        .panel { background: white; max-width: 450px; margin: auto; padding: 20px; border-radius: 10px; }
+        input, textarea { width: 100%; padding: 10px; margin: 10px 0; border: 1px solid #ccc; border-radius: 5px; box-sizing: border-box; }
+        button { width: 100%; padding: 15px; background: #003366; color: white; border: none; font-weight: bold; cursor: pointer; }
     </style>
 </head>
 <body>
     <div class="panel">
-        <h2>Opettajien Paneeli</h2>
-        
-        <label>OPPILAAN SÄHKÖPOSTI (tarkka)</label>
-        <input type="email" id="targetEmail" placeholder="esim. veeti.savolainen@koulu.fi">
-        
-        <label>OPETTAJAN NIMI</label>
-        <input type="text" id="teacher" placeholder="esim. Aspelin-Hällback Marianne">
-        
-        <label>OPPIaine</label>
-        <input type="text" id="subject" placeholder="esim. Matematiikka">
-        
-        <label>MERKINNÄN TYYPPI</label>
-        <input type="text" id="reason" placeholder="esim. Huomautus / Tsemppasit">
-        
-        <label>KOMMENTTI</label>
-        <textarea id="comment" rows="3" placeholder="Kirjoita vapaa palaute täähän..."></textarea>
-        
-        <label>KORTIN REUNAN VÄRI</label>
-        <input type="color" id="color" value="#ff0000" style="height: 50px;">
-        
-        <button id="sendBtn">LÄHETÄ WILMA-MERKINTÄ</button>
+        <h2 style="text-align:center">Uusi merkintä</h2>
+        <input type="email" id="targetEmail" placeholder="Oppilaan sähköposti">
+        <input type="text" id="teacher" placeholder="Opettaja">
+        <input type="text" id="subject" placeholder="Oppiaine">
+        <input type="text" id="reason" placeholder="Merkinnän syy">
+        <textarea id="comment" placeholder="Kommentti"></textarea>
+        <label>Väri:</label>
+        <input type="color" id="color" value="#ff0000">
+        <button id="sendBtn">LÄHETÄ</button>
     </div>
 
     <script type="module">
@@ -45,19 +29,18 @@
         import { getFirestore, collection, addDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
         const firebaseConfig = {
-          apiKey: "AIzaSyBnBxP9nN_z1nFB_bD4pgbG4W-uwnyN-jk",
-          authDomain: "wilma-feikki.firebaseapp.com",
-          projectId: "wilma-feikki",
-          storageBucket: "wilma-feikki.firebasestorage.app",
-          messagingSenderId: "536302104544",
-          appId: "1:536302104544:web:41526cb87af29f98790585"
+            apiKey: "AIzaSyBnBxP9nN_z1nFB_bD4pgbG4W-uwnyN-jk",
+            authDomain: "wilma-feikki.firebaseapp.com",
+            projectId: "wilma-feikki",
+            storageBucket: "wilma-feikki.firebasestorage.app",
+            messagingSenderId: "536302104544",
+            appId: "1:536302104544:web:41526cb87af29f98790585"
         };
 
         const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
 
         document.getElementById('sendBtn').onclick = async () => {
-            const btn = document.getElementById('sendBtn');
             const data = {
                 targetEmail: document.getElementById('targetEmail').value.toLowerCase().trim(),
                 teacher: document.getElementById('teacher').value,
@@ -67,25 +50,8 @@
                 color: document.getElementById('color').value,
                 date: new Date()
             };
-
-            if (!data.targetEmail || !data.reason) {
-                alert("Oppilaan sähköposti ja syy ovat pakollisia!");
-                return;
-            }
-
-            try {
-                btn.disabled = true;
-                btn.innerText = "LÄHETETÄÄN...";
-                await addDoc(collection(db, "merkinnat"), data);
-                alert("Merkintä lähetetty käyttäjälle " + data.targetEmail);
-                document.getElementById('comment').value = "";
-                document.getElementById('reason').value = "";
-            } catch (e) {
-                alert("Virhe: " + e.message);
-            } finally {
-                btn.disabled = false;
-                btn.innerText = "LÄHETÄ WILMA-MERKINTÄ";
-            }
+            await addDoc(collection(db, "merkinnat"), data);
+            alert("Lähetetty!");
         };
     </script>
 </body>
