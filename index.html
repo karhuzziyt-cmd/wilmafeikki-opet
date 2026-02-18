@@ -10,7 +10,6 @@
         label { font-size: 12px; color: #666; font-weight: bold; display: block; margin-top: 10px; }
         input, select, textarea { width: 100%; padding: 10px; margin: 5px 0 15px; border: 1px solid #ccc; border-radius: 5px; box-sizing: border-box; }
         
-        /* Värivalitsimen tyyli */
         .color-input { height: 50px; cursor: pointer; padding: 5px; }
         
         button { width: 100%; padding: 12px; background: #003366; color: white; border: none; border-radius: 5px; cursor: pointer; font-weight: bold; font-size: 16px; }
@@ -42,8 +41,11 @@
         
         <label>Merkinnän aihe (esim. Huomautus, Kiitos, Myöhästyminen)</label>
         <input type="text" id="reason" placeholder="Kirjoita merkinnän otsikko">
+
+        <label>Kesto (Duration - esim. 45 tai 75)</label>
+        <input type="number" id="duration" placeholder="Minuutit">
         
-        <label>Valitse merkinnän väri (palkki vasemmassa reunassa)</label>
+        <label>Valitse merkinnän väri</label>
         <input type="color" id="colorPicker" class="color-input" value="#d32f2f">
         
         <label>Lisätiedot / Kommentti</label>
@@ -96,6 +98,7 @@
             const email = document.getElementById('targetEmail').value.toLowerCase().trim();
             const teacher = document.getElementById('teacherName').value;
             const reason = document.getElementById('reason').value;
+            const duration = document.getElementById('duration').value;
             const color = document.getElementById('colorPicker').value;
 
             if (!email || !reason) {
@@ -109,13 +112,14 @@
                     teacher: teacher,
                     subject: document.getElementById('subject').value,
                     reason: reason,
+                    duration: duration, // TALLENTAA KESTON
                     comment: document.getElementById('comment').value,
                     color: color,
                     date: serverTimestamp()
                 });
                 alert("Merkintä lähetetty onnistuneesti!");
-                // Tyhjennetään kentät
                 document.getElementById('reason').value = "";
+                document.getElementById('duration').value = "";
                 document.getElementById('comment').value = "";
             } catch (e) {
                 alert("Virhe lähetyksessä: " + e.message);
