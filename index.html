@@ -4,152 +4,90 @@
     <meta charset="UTF-8">
     <title>Wilma - Opettajan Paneeli</title>
     <style>
-        body { font-family: sans-serif; padding: 20px; background: #f0f2f5; }
+        body { font-family: sans-serif; background: #f0f2f5; padding: 20px; }
         .card { background: white; padding: 20px; border-radius: 10px; max-width: 500px; margin: 0 auto 20px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
-        h2 { color: #003366; border-bottom: 2px solid #003366; padding-bottom: 10px; }
-        label { font-size: 12px; color: #666; font-weight: bold; display: block; margin-top: 10px; }
-        input, select, textarea { width: 100%; padding: 10px; margin: 5px 0 15px; border: 1px solid #ccc; border-radius: 5px; box-sizing: border-box; }
-        
-        .color-input { height: 50px; cursor: pointer; padding: 5px; }
-        
-        button { width: 100%; padding: 12px; background: #003366; color: white; border: none; border-radius: 5px; cursor: pointer; font-weight: bold; font-size: 16px; }
-        button:hover { background: #002244; }
-        
-        .tab-btns { display: flex; gap: 10px; justify-content: center; margin-bottom: 20px; }
-        .tab-btn { background: #ddd; color: black; padding: 10px 20px; border-radius: 20px; cursor: pointer; font-weight: bold; }
+        input, select, textarea { width: 100%; padding: 10px; margin: 10px 0; border: 1px solid #ddd; border-radius: 5px; box-sizing: border-box; }
+        button { width: 100%; padding: 12px; border: none; border-radius: 5px; color: white; cursor: pointer; font-weight: bold; }
+        .tabs { display: flex; justify-content: center; gap: 10px; margin-bottom: 20px; }
+        .tab-btn { padding: 10px 20px; background: #ddd; cursor: pointer; border-radius: 5px; }
         .tab-btn.active { background: #003366; color: white; }
     </style>
 </head>
 <body>
 
-    <div class="tab-btns">
-        <div id="btn1" class="tab-btn active" onclick="showTab('merkinta')">Uusi merkintä</div>
-        <div id="btn2" class="tab-btn" onclick="showTab('viesti')">Luo uusi viesti</div>
+    <div class="tabs">
+        <div id="t1" class="tab-btn active" onclick="showTab('merkinta')">Merkintä</div>
+        <div id="t2" class="tab-btn" onclick="showTab('viesti')">Viesti</div>
+        <div id="t3" class="tab-btn" onclick="showTab('lukujarjestys')">Lukujärjestys</div>
     </div>
 
     <div id="tabMerkinta" class="card">
-        <h2>Uusi Wilma-merkintä</h2>
-        
-        <label>Oppilaan sähköposti</label>
-        <input type="email" id="targetEmail" placeholder="esim. oppilas@koulu.fi">
-        
-        <label>Opettajan nimi</label>
-        <input type="text" id="teacherName" placeholder="esim. Opettaja Virtanen">
-        
-        <label>Oppiaine</label>
-        <input type="text" id="subject" placeholder="esim. Matematiikka">
-        
-        <label>Merkinnän aihe (esim. Huomautus, Kiitos, Myöhästyminen)</label>
-        <input type="text" id="reason" placeholder="Kirjoita merkinnän otsikko">
-
-        <label>Kesto (Duration - esim. 45 tai 75)</label>
-        <input type="number" id="duration" placeholder="Minuutit">
-        
-        <label>Valitse merkinnän väri</label>
-        <input type="color" id="colorPicker" class="color-input" value="#d32f2f">
-        
-        <label>Lisätiedot / Kommentti</label>
-        <textarea id="comment" rows="4" placeholder="Kirjoita vapaamuotoinen palaute tähän..."></textarea>
-        
-        <button onclick="sendNote()">LÄHETÄ MERKINTÄ</button>
+        <h2>Luo merkintä</h2>
+        <input type="text" id="mEmail" placeholder="Oppilaan sähköposti">
+        <select id="mColor">
+            <option value="#4caf50">Vihreä (Hyvä)</option>
+            <option value="#f44336">Punainen (Poissaolo)</option>
+            <option value="#ff9800">Oranssi (Huomautus)</option>
+        </select>
+        <input type="text" id="mReason" placeholder="Syy (esim. Myöhästyminen)">
+        <input type="number" id="mDuration" placeholder="Kesto (min)">
+        <textarea id="mComment" placeholder="Lisätiedot"></textarea>
+        <button onclick="saveNote()" style="background:#003366">LÄHETÄ MERKINTÄ</button>
     </div>
 
-    <div id="tabViesti" class="card" style="display:none;">
-        <h2>Luo uusi viesti</h2>
-        <label>Vastaanottajan sähköposti</label>
-        <input type="email" id="msgTarget" placeholder="oppilas@koulu.fi">
-        
-        <label>Lähettäjän nimi</label>
-        <input type="text" id="msgSender" placeholder="Opettaja Virtanen">
-        
-        <label>Aihe</label>
-        <input type="text" id="msgSubject" placeholder="Viestin otsikko">
-        
-        <label>Viestin sisältö</label>
-        <textarea id="msgBody" rows="6" placeholder="Kirjoita viestin sisältö tähän..."></textarea>
-        
-        <button onclick="sendMessage()" style="background: #28a745;">LÄHETÄ VIESTI</button>
+    <div id="tabLukujarjestys" class="card" style="display:none">
+        <h2>Lisää lukujärjestykseen</h2>
+        <input type="text" id="sEmail" placeholder="Oppilas (tai 'kaikki')">
+        <select id="sDay">
+            <option value="1">Maanantai</option>
+            <option value="2">Tiistai</option>
+            <option value="3">Keskiviikko</option>
+            <option value="4">Torstai</option>
+            <option value="5">Perjantai</option>
+        </select>
+        <input type="text" id="sTime" placeholder="Aika (esim. 09:00 - 10:30)">
+        <input type="text" id="sSubject" placeholder="Oppiaine ja luokka">
+        <button onclick="saveSchedule()" style="background:#6f42c1">LISÄÄ LUKUJÄRJESTYKSEEN</button>
     </div>
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
         import { getFirestore, collection, addDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
-        const firebaseConfig = {
-            apiKey: "AIzaSyBnBxP9nN_z1nFB_bD4pgbG4W-uwnyN-jk",
-            authDomain: "wilma-feikki.firebaseapp.com",
-            projectId: "wilma-feikki",
-            storageBucket: "wilma-feikki.firebasestorage.app",
-            messagingSenderId: "536302104544",
-            appId: "1:536302104544:web:41526cb87af29f98790585"
-        };
-
+        const firebaseConfig = { /* SINUN CONFIG TÄHÄN */ };
         const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
 
-        window.showTab = (tab) => {
-            document.getElementById('tabMerkinta').style.display = tab === 'merkinta' ? 'block' : 'none';
-            document.getElementById('tabViesti').style.display = tab === 'viesti' ? 'block' : 'none';
-            document.getElementById('btn1').classList.toggle('active', tab === 'merkinta');
-            document.getElementById('btn2').classList.toggle('active', tab === 'viesti');
+        window.showTab = (t) => {
+            document.getElementById('tabMerkinta').style.display = t === 'merkinta' ? 'block' : 'none';
+            document.getElementById('tabLukujarjestys').style.display = t === 'lukujarjestys' ? 'block' : 'none';
+            document.getElementById('t1').classList.toggle('active', t === 'merkinta');
+            document.getElementById('t3').classList.toggle('active', t === 'lukujarjestys');
         };
 
-        window.sendNote = async () => {
-            const email = document.getElementById('targetEmail').value.toLowerCase().trim();
-            const teacher = document.getElementById('teacherName').value;
-            const reason = document.getElementById('reason').value;
-            const duration = document.getElementById('duration').value;
-            const color = document.getElementById('colorPicker').value;
-
-            if (!email || !reason) {
-                alert("Täytä vähintään sähköposti ja aihe!");
-                return;
-            }
-
-            try {
-                await addDoc(collection(db, "merkinnat"), {
-                    targetEmail: email,
-                    teacher: teacher,
-                    subject: document.getElementById('subject').value,
-                    reason: reason,
-                    duration: duration, // TALLENTAA KESTON
-                    comment: document.getElementById('comment').value,
-                    color: color,
-                    date: serverTimestamp()
-                });
-                alert("Merkintä lähetetty onnistuneesti!");
-                document.getElementById('reason').value = "";
-                document.getElementById('duration').value = "";
-                document.getElementById('comment').value = "";
-            } catch (e) {
-                alert("Virhe lähetyksessä: " + e.message);
-            }
+        window.saveNote = async () => {
+            const data = {
+                targetEmail: document.getElementById('mEmail').value.toLowerCase().trim(),
+                reason: document.getElementById('mReason').value,
+                color: document.getElementById('mColor').value,
+                duration: document.getElementById('mDuration').value,
+                comment: document.getElementById('mComment').value,
+                teacher: "Opettaja",
+                date: serverTimestamp()
+            };
+            await addDoc(collection(db, "merkinnat"), data);
+            alert("Merkintä lähetetty!");
         };
 
-        window.sendMessage = async () => {
-            const email = document.getElementById('msgTarget').value.toLowerCase().trim();
-            const sender = document.getElementById('msgSender').value;
-            const subject = document.getElementById('msgSubject').value;
-
-            if (!email || !subject) {
-                alert("Täytä vähintään sähköposti ja aihe!");
-                return;
-            }
-
-            try {
-                await addDoc(collection(db, "viestit"), {
-                    targetEmail: email,
-                    sender: sender,
-                    subject: subject,
-                    body: document.getElementById('msgBody').value,
-                    date: serverTimestamp()
-                });
-                alert("Viesti lähetetty onnistuneesti!");
-                document.getElementById('msgSubject').value = "";
-                document.getElementById('msgBody').value = "";
-            } catch (e) {
-                alert("Virhe lähetyksessä: " + e.message);
-            }
+        window.saveSchedule = async () => {
+            const data = {
+                targetEmail: document.getElementById('sEmail').value.toLowerCase().trim(),
+                day: parseInt(document.getElementById('sDay').value),
+                time: document.getElementById('sTime').value,
+                subject: document.getElementById('sSubject').value
+            };
+            await addDoc(collection(db, "lukujarjestys"), data);
+            alert("Tunti lisätty!");
         };
     </script>
 </body>
