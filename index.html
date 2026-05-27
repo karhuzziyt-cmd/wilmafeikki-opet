@@ -74,6 +74,8 @@
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
         import { getFirestore, collection, addDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+        // TUODAAN AUTENTIKAATIO MUKAAN SUOJAUSTA VARTEN
+        import { getAuth, signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
 
         const firebaseConfig = {
             apiKey: "AIzaSyBnBxP9nN_z1nFB_bD4pgbG4W-uwnyN-jk",
@@ -86,6 +88,17 @@
 
         const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
+        const auth = getAuth(app);
+
+        // TÄMÄ LOGGAA SIVUN AUTOMAATTISESTI SISÄÄN TAUSTALLA
+        // Käy luomassa Firebase Consolessa (Authentication -> Users) tunnukset opettaja@koulu.fi ja joku salasana, ja laita ne tähän alle!
+        signInWithEmailAndPassword(auth, "opettaja@koulu.fi", "SunSalainenSalasana123")
+            .then(() => {
+                console.log("Suojattu yhteys luotu onnistuneesti. Vain tämä sivu voi nyt kirjoittaa.");
+            })
+            .catch((error) => {
+                console.error("Suojausvirhe: ", error.message);
+            });
 
         window.showTab = (tab) => {
             document.getElementById('tabMerkinta').style.display = tab === 'merkinta' ? 'block' : 'none';
@@ -112,7 +125,7 @@
                     teacher: teacher,
                     subject: document.getElementById('subject').value,
                     reason: reason,
-                    duration: duration, // TALLENTAA KESTON
+                    duration: duration,
                     comment: document.getElementById('comment').value,
                     color: color,
                     date: serverTimestamp()
