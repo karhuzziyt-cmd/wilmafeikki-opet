@@ -22,60 +22,72 @@
 </head>
 <body>
 
-    <div class="tab-btns">
-        <div id="btn1" class="tab-btn active" onclick="showTab('merkinta')">Uusi merkintä</div>
-        <div id="btn2" class="tab-btn" onclick="showTab('viesti')">Luo uusi viesti</div>
+    <div id="authCard" class="card">
+        <h2>Opettajan kirjautuminen</h2>
+        <label>Sähköposti</label>
+        <input type="email" id="loginEmail" placeholder="ope@koulu.fi">
+        <label>Salasana</label>
+        <input type="password" id="loginPassword" placeholder="Kirjoita salasana">
+        <button id="loginBtn" onclick="handleLogin()">KIRJAUDU SISÄÄN</button>
+        <p id="authStatus" style="color: red; font-size: 14px; margin-top: 10px; font-weight: bold;"></p>
     </div>
 
-    <div id="tabMerkinta" class="card">
-        <h2>Uusi Wilma-merkintä</h2>
-        
-        <label>Oppilaan sähköposti</label>
-        <input type="email" id="targetEmail" placeholder="esim. oppilas@koulu.fi">
-        
-        <label>Opettajan nimi</label>
-        <input type="text" id="teacherName" placeholder="esim. Opettaja Virtanen">
-        
-        <label>Oppiaine</label>
-        <input type="text" id="subject" placeholder="esim. Matematiikka">
-        
-        <label>Merkinnän aihe (esim. Huomautus, Kiitos, Myöhästyminen)</label>
-        <input type="text" id="reason" placeholder="Kirjoita merkinnän otsikko">
+    <div id="panelContent" style="display: none;">
+        <div class="tab-btns">
+            <div id="btn1" class="tab-btn active" onclick="showTab('merkinta')">Uusi merkintä</div>
+            <div id="btn2" class="tab-btn" onclick="showTab('viesti')">Luo uusi viesti</div>
+        </div>
 
-        <label>Kesto (Duration - esim. 45 tai 75)</label>
-        <input type="number" id="duration" placeholder="Minuutit">
-        
-        <label>Valitse merkinnän väri</label>
-        <input type="color" id="colorPicker" class="color-input" value="#d32f2f">
-        
-        <label>Lisätiedot / Kommentti</label>
-        <textarea id="comment" rows="4" placeholder="Kirjoita vapaamuotoinen palaute tähän..."></textarea>
-        
-        <button onclick="sendNote()">LÄHETÄ MERKINTÄ</button>
-    </div>
+        <div id="tabMerkinta" class="card">
+            <h2>Uusi Wilma-merkintä</h2>
+            
+            <label>Oppilaan sähköposti</label>
+            <input type="email" id="targetEmail" placeholder="esim. oppilas@koulu.fi">
+            
+            <label>Opettajan nimi</label>
+            <input type="text" id="teacherName" placeholder="esim. Opettaja Virtanen">
+            
+            <label>Oppiaine</label>
+            <input type="text" id="subject" placeholder="esim. Matematiikka">
+            
+            <label>Merkinnän aihe (esim. Huomautus, Kiitos, Myöhästyminen)</label>
+            <input type="text" id="reason" placeholder="Kirjoita merkinnän otsikko">
 
-    <div id="tabViesti" class="card" style="display:none;">
-        <h2>Luo uusi viesti</h2>
-        <label>Vastaanottajan sähköposti</label>
-        <input type="email" id="msgTarget" placeholder="oppilas@koulu.fi">
-        
-        <label>Lähettäjän nimi</label>
-        <input type="text" id="msgSender" placeholder="Opettaja Virtanen">
-        
-        <label>Aihe</label>
-        <input type="text" id="msgSubject" placeholder="Viestin otsikko">
-        
-        <label>Viestin sisältö</label>
-        <textarea id="msgBody" rows="6" placeholder="Kirjoita viestin sisältö tähän..."></textarea>
-        
-        <button onclick="sendMessage()" style="background: #28a745;">LÄHETÄ VIESTI</button>
+            <label>Kesto (Duration - esim. 45 tai 75)</label>
+            <input type="number" id="duration" placeholder="Minuutit">
+            
+            <label>Valitse merkinnän väri</label>
+            <input type="color" id="colorPicker" class="color-input" value="#d32f2f">
+            
+            <label>Lisätiedot / Kommentti</label>
+            <textarea id="comment" rows="4" placeholder="Kirjoita vapaamuotoinen palaute tähän..."></textarea>
+            
+            <button onclick="sendNote()">LÄHETÄ MERKINTÄ</button>
+        </div>
+
+        <div id="tabViesti" class="card" style="display:none;">
+            <h2>Luo uusi viesti</h2>
+            <label>Vastaanottajan sähköposti</label>
+            <input type="email" id="msgTarget" placeholder="oppilas@koulu.fi">
+            
+            <label>Lähettäjän nimi</label>
+            <input type="text" id="msgSender" placeholder="Opettaja Virtanen">
+            
+            <label>Aihe</label>
+            <input type="text" id="msgSubject" placeholder="Viestin otsikko">
+            
+            <label>Viestin sisältö</label>
+            <textarea id="msgBody" rows="6" placeholder="Kirjoita viestin sisältö tähän..."></textarea>
+            
+            <button onclick="sendMessage()" style="background: #28a745;">LÄHETÄ VIESTI</button>
+        </div>
     </div>
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
         import { getFirestore, collection, addDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
-        // TUODAAN AUTENTIKAATIO MUKAAN SUOJAUSTA VARTEN
-        import { getAuth, signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+        // TUODAAN AUTENTIKAATIO MUKAAN KUNNOLLA
+        import { getAuth, signInWithEmailAndPassword, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
 
         const firebaseConfig = {
             apiKey: "AIzaSyBnBxP9nN_z1nFB_bD4pgbG4W-uwnyN-jk",
@@ -90,15 +102,39 @@
         const db = getFirestore(app);
         const auth = getAuth(app);
 
-        // TÄMÄ LOGGAA SIVUN AUTOMAATTISESTI SISÄÄN TAUSTALLA
-        // Käy luomassa Firebase Consolessa (Authentication -> Users) tunnukset opettaja@koulu.fi ja joku salasana, ja laita ne tähän alle!
-        signInWithEmailAndPassword(auth, "opettaja@koulu.fi", "SunSalainenSalasana123")
-            .then(() => {
-                console.log("Suojattu yhteys luotu onnistuneesti. Vain tämä sivu voi nyt kirjoittaa.");
-            })
-            .catch((error) => {
-                console.error("Suojausvirhe: ", error.message);
-            });
+        // KIRJAUTUMISEN HOITAVA FUNKTIO
+        window.handleLogin = async () => {
+            const email = document.getElementById('loginEmail').value.trim();
+            const pass = document.getElementById('loginPassword').value;
+            const statusText = document.getElementById('authStatus');
+
+            if (!email || !pass) {
+                statusText.innerText = "Täytä sähköposti ja salasana!";
+                return;
+            }
+
+            try {
+                statusText.style.color = "orange";
+                statusText.innerText = "Kirjaudutaan sisään...";
+                await signInWithEmailAndPassword(auth, email, pass);
+            } catch (e) {
+                statusText.style.color = "red";
+                statusText.innerText = "Virhe: " + e.message;
+            }
+        };
+
+        // TÄMÄ TARKISTAA ONKO OPETTAJA KIRJAUTUNUT JA AVAA SIVUN
+        onAuthStateChanged(auth, (user) => {
+            if (user) {
+                // Jos on kirjautunut, piilotetaan kirjautumislaatikko ja näytetään itse paneeli
+                document.getElementById('authCard').style.display = 'none';
+                document.getElementById('panelContent').style.display = 'block';
+            } else {
+                // Jos ei ole kirjautunut, pidetään paneeli piilossa
+                document.getElementById('authCard').style.display = 'block';
+                document.getElementById('panelContent').style.display = 'none';
+            }
+        });
 
         window.showTab = (tab) => {
             document.getElementById('tabMerkinta').style.display = tab === 'merkinta' ? 'block' : 'none';
